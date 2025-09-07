@@ -1,78 +1,44 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import React, { createContext, useState, useContext } from 'react';
+import axios from 'axios';
+
+const API = axios.create({
+  baseURL: 'http://localhost:3000', // Backend Rails app URL
+  withCredentials: true,
+});
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState('');
 
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      checkCurrentUser();
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  const checkCurrentUser = async () => {
-    try {
-      const response = await authAPI.getCurrentUser();
-      setUser(response.data);
-    } catch (error) {
-      localStorage.removeItem('authToken');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Login function
   const login = async (email, password) => {
     try {
-      const response = await authAPI.login(email, password);
-      setUser(response.data.user);
+      const res = await API.post('/login', { user: { email, password } });
+      setUser(res.data.user);
+      setAuthError('');
       return { success: true };
-    } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Login failed' };
-    }
-  };
-
-  const register = async (email, password) => {
-    try {
-      const response = await authAPI.register(email, password);
-      setUser(response.data.user);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Registration failed' };
+    } catch (err) {
+      const message = err.response?.data?.error || 'Invalid email or password';
+      setAuthError(message);
+      return { success: false, error: message };
     }
   };
 
   const logout = async () => {
     try {
-      await authAPI.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
+      await API.delete('/logout');
     } finally {
-      localStorage.removeItem('authToken');
       setUser(null);
     }
   };
 
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    loading,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, login, logout, authError, setAuthError }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
