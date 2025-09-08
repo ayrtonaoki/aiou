@@ -28,6 +28,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (email, password) => {
+    try {
+      const res = await API.post('/signup', {
+        user: {
+          email,
+          password,
+          password_confirmation: password
+        }
+      });
+      setUser(res.data.user);
+      setAuthError('');
+      return { success: true };
+    } catch (err) {
+      const message = err.response?.data?.error || 'Registration failed';
+      setAuthError(message);
+      return { success: false, error: message };
+    }
+  };
+
   const logout = async () => {
     try {
       await API.delete('/logout');
@@ -37,7 +56,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, authError, setAuthError }}>
+    <AuthContext.Provider value={{ user, login, register, logout, authError, setAuthError }}>
       {children}
     </AuthContext.Provider>
   );
