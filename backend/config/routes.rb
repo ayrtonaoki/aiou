@@ -17,4 +17,6 @@ Rails.application.routes.draw do
       get '/current_user', to: 'current_user#index'
     end
   end
+
+  root to: redirect('/login')
 end
