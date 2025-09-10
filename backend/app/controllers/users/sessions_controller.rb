@@ -7,6 +7,9 @@ class Users::SessionsController < Devise::SessionsController
     if resource
       sign_in(resource_name, resource)
 
+      token = Warden::JWTAuth::UserEncoder.new.call(resource, :user, nil)
+      response.set_header('Authorization', "Bearer #{token[0]}")
+
       render json: { message: 'Logged in', user: resource }, status: :ok
     else
       render json: { error: 'Invalid email or password' }, status: :unauthorized
@@ -16,7 +19,6 @@ class Users::SessionsController < Devise::SessionsController
   def destroy
     if current_user
       sign_out(resource_name)
-
       render json: { message: 'Logged out' }, status: :ok
     else
       render json: { message: 'No active session' }, status: :unauthorized
