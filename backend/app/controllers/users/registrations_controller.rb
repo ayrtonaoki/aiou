@@ -6,21 +6,18 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def create
     build_resource(sign_up_params)
-    puts "Errors before save: #{resource.errors.full_messages}" # Debug line
     resource.save
-    puts "Errors after save: #{resource.errors.full_messages}" # Debug line
+
     yield resource if block_given?
+
     if resource.persisted?
-      if resource.active_for_authentication?
-        sign_up(resource_name, resource)
-        render json: { message: 'Signed up successfully.', user: resource }, status: :ok
-      else
-        expire_data_after_sign_in!
-        render json: { message: 'Signed up successfully but confirmation required.' }, status: :ok
-      end
+      sign_up(resource_name, resource)
+
+      render json: { message: 'Signed up successfully.', user: resource }, status: :ok
     else
       clean_up_passwords resource
       set_minimum_password_length
+
       render json: { message: 'User creation failed.', errors: resource.errors.full_messages }, status: :unprocessable_entity
     end
   end
