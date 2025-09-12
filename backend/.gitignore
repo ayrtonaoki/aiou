@@ -69,8 +69,5 @@ yarn.lock
 .ruby-version
 .rbenv-version
 
-# Bundler
-Gemfile.lock
-
 # Ignore application credentials
 /config/credentials/
