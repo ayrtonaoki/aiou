@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: db
+  username: postgres
+  password: password
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: aiou_development
+
+test:
+  <<: *default
+  database: aiou_test
+
+production:
+  <<: *default
+  database: aiou_production
+  username: aiou
+  password: <%= ENV["MYAPP_DATABASE_PASSWORD"] %>
