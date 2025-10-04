@@ -11,6 +11,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
     yield resource if block_given?
 
     if resource.persisted?
+      TrackEventJob.perform_later(
+        resource.id,
+        "signup",
+        { ip: request.remote_ip },
+        Time.current
+      )
+
       sign_up(resource_name, resource)
 
       render json: { message: 'Signed up successfully.', user: resource }, status: :ok
