@@ -76,6 +76,10 @@ const Login = () => {
     textAlign: 'center'
   };
 
+  const linkStyle = {
+    color: '#808080ff'
+  }
+
   return (
     <div style={wrapperStyle}>
       <div style={cardStyle}>
@@ -145,7 +149,7 @@ const Login = () => {
         </form>
 
         <p style={{ textAlign: 'center', marginTop: 15 }}>
-          Don't have an account? <Link to="/register">Sign Up here</Link>
+          Don't have an account? <Link to="/register" style={linkStyle}>Sign Up here</Link>
         </p>
       </div>
     </div>

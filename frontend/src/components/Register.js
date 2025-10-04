@@ -73,6 +73,10 @@ const Register = () => {
     textAlign: 'center'
   };
 
+  const linkStyle = {
+    color: '#808080ff'
+  }
+
   return (
     <div style={wrapperStyle}>
       <div style={cardStyle}>
@@ -141,7 +145,7 @@ const Register = () => {
         </form>
 
         <p style={{ textAlign: 'center', marginTop: 15 }}>
-          Already have an account? <Link to="/login">Sign in here</Link>
+          Already have an account? <Link to="/login" style={linkStyle}>Sign in here</Link>
         </p>
       </div>
     </div>
