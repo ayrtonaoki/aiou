@@ -1,22 +1,17 @@
 Rails.application.routes.draw do
   devise_for :users,
-             path: '',
-             path_names: {
-               sign_in: 'login',
-               sign_out: 'logout',
-               registration: 'signup'
-             },
              controllers: {
-               sessions: 'users/sessions',
-               registrations: 'users/registrations'
-             }
+               registrations: 'users/registrations',
+               sessions: 'users/sessions'
+             },
+             defaults: { format: :json }
 
-  namespace :api do
-    namespace :v1 do
-      resources :posts
-      get '/current_user', to: 'current_user#index'
-    end
+  devise_scope :user do
+    post '/signup', to: 'users/registrations#create'
+    post '/login', to: 'users/sessions#create'
+    delete '/logout', to: 'users/sessions#destroy'
+    get '/current_user', to: 'users/sessions#current'
   end
 
-  root to: redirect('/login')
+  root to: "home#index"
 end

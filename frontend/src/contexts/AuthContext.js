@@ -3,38 +3,24 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [user, setUser] = useState(null);
   const [authError, setAuthError] = useState('');
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-      localStorage.removeItem('authToken');
-    }
-  }, [user]);
+  const [loading, setLoading] = useState(true);
 
   const login = async (email, password) => {
     try {
       const res = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user: { email, password }
-        })
+        credentials: 'include',
+        body: JSON.stringify({ user: { email, password } }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        const token = res.headers.get('Authorization')?.replace('Bearer ', '');
-        if (token) localStorage.setItem('authToken', token);
-
         setUser(data.user);
+        setAuthError('');
         return { success: true };
       } else {
         setAuthError(data.error || 'Invalid email or password');
@@ -51,41 +37,49 @@ export const AuthProvider = ({ children }) => {
       const res = await fetch('http://localhost:3000/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
-          user: { email, password, password_confirmation: password }
-        })
+          user: { email, password, password_confirmation: password },
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        const token = res.headers.get('Authorization')?.replace('Bearer ', '');
-        if (token) localStorage.setItem('authToken', token);
-
         setUser(data.user);
+        setAuthError('');
         return { success: true };
       } else {
-        return { success: false, error: data.errors?.join(', ') || 'Registration failed' };
+        setAuthError(data.errors?.join(', ') || 'Registration failed');
+        return { success: false, error: data.errors?.join(', ') };
       }
     } catch (err) {
+      setAuthError('Network error');
       return { success: false, error: 'Network error' };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await fetch('http://localhost:3000/logout', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      setUser(null);
+      setAuthError('');
+    } catch {
+      setAuthError('Network error during logout');
+    }
   };
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const token = localStorage.getItem('authToken');
-      if (!token) return;
-
       try {
-        const res = await fetch('http://localhost:3000/api/v1/current_user', {
-          headers: { Authorization: `Bearer ${token}` }
+        const res = await fetch('http://localhost:3000/current_user', {
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
         });
+
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
@@ -94,13 +88,18 @@ export const AuthProvider = ({ children }) => {
         }
       } catch {
         setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchCurrentUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, authError, setAuthError }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, authError, setAuthError, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

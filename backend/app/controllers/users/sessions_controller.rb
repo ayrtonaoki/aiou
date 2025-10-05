@@ -1,24 +1,19 @@
 class Users::SessionsController < Devise::SessionsController
+  include ActionController::Cookies
   respond_to :json
 
   def create
-    self.resource = warden.authenticate(auth_options)
-    if resource
-      TrackEventJob.perform_later(
-        resource.id,
-        "login",
-        { ip: request.remote_ip, user_agent: request.user_agent },
-        Time.current
-      )
+    self.resource = warden.authenticate!(auth_options)
+    sign_in(resource_name, resource)
 
-      sign_in(resource_name, resource)
-      token = Warden::JWTAuth::UserEncoder.new.call(resource, :user, nil)
-      response.set_header('Authorization', "Bearer #{token[0]}")
+    TrackEventJob.perform_later(
+      resource.id,
+      "login",
+      { ip: request.remote_ip },
+      Time.current
+    )
 
-      render json: { message: 'Logged in', user: resource }, status: :ok
-    else
-      render json: { error: 'Invalid email or password' }, status: :unauthorized
-    end
+    render json: { message: "Logged in successfully.", user: resource }, status: :ok
   end
 
   def destroy
@@ -29,10 +24,17 @@ class Users::SessionsController < Devise::SessionsController
         { ip: request.remote_ip },
         Time.current
       )
-      sign_out(resource_name)
-      render json: { message: 'Logged out' }, status: :ok
+    end
+
+    sign_out(current_user)
+    render json: { message: "Logged out successfully." }, status: :ok
+  end
+
+  def current
+    if current_user
+      render json: { user: current_user }, status: :ok
     else
-      render json: { message: 'No active session' }, status: :unauthorized
+      render json: { user: nil }, status: :ok
     end
   end
 end
