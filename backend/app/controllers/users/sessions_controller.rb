@@ -9,7 +9,7 @@ class Users::SessionsController < Devise::SessionsController
     TrackEventJob.perform_later(
       resource.id,
       "login",
-      { ip: request.remote_ip },
+      metadata,
       Time.current
     )
 
@@ -21,7 +21,7 @@ class Users::SessionsController < Devise::SessionsController
       TrackEventJob.perform_later(
         current_user.id,
         "logout",
-        { ip: request.remote_ip },
+        metadata,
         Time.current
       )
     end
@@ -36,5 +36,19 @@ class Users::SessionsController < Devise::SessionsController
     else
       render json: { user: nil }, status: :ok
     end
+  end
+
+  private
+
+  def metadata
+    {
+      email: request.params["user"]["email"],
+      ip: request.remote_ip,
+      user_agent: request.user_agent,
+      scheme: request.scheme,
+      url: request.url,
+      method: request.method,
+      format: request.format.to_s
+    }
   end
 end

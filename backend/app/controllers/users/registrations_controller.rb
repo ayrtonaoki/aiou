@@ -14,7 +14,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       TrackEventJob.perform_later(
         resource.id,
         "signup",
-        { ip: request.remote_ip },
+        metadata,
         Time.current
       )
 
@@ -32,5 +32,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def configure_sign_up_params
     devise_parameter_sanitizer.permit(:sign_up, keys: [:email, :password, :password_confirmation])
+  end
+
+  def metadata
+    {
+      email: request.params["user"]["email"],
+      ip: request.remote_ip,
+      user_agent: request.user_agent,
+      scheme: request.scheme,
+      url: request.url,
+      method: request.method,
+      format: request.format.to_s
+    }
   end
 end
