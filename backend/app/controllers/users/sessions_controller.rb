@@ -18,15 +18,13 @@ class Users::SessionsController < Devise::SessionsController
 
   def destroy
     if current_user
-      TrackEventJob.perform_later(
-        current_user.id,
-        "logout",
-        metadata,
-        Time.current
-      )
+      TrackEventJob.perform_later(current_user.id, "logout", metadata, Time.current)
     end
 
-    sign_out(current_user)
+    reset_session
+
+    cookies.delete(Rails.application.config.session_options[:key], domain: :all, path: '/')
+
     render json: { message: "Logged out successfully." }, status: :ok
   end
 
@@ -42,7 +40,7 @@ class Users::SessionsController < Devise::SessionsController
 
   def metadata
     {
-      email: request.params["user"]["email"],
+      email: request.params.dig("user", "email") || current_user&.email,
       ip: request.remote_ip,
       user_agent: request.user_agent,
       scheme: request.scheme,

@@ -8,6 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const login = async (email, password) => {
+    setUser(null);
+
     try {
       const res = await fetch('http://localhost:3000/login', {
         method: 'POST',
@@ -61,12 +63,19 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:3000/logout', {
+      const res = await fetch('http://localhost:3000/logout', {
         method: 'DELETE',
         credentials: 'include',
       });
-      setUser(null);
-      setAuthError('');
+
+      if (res.ok) {
+        setUser(null);
+        setAuthError('');
+
+        window.location.href = '/login';
+      } else {
+        setAuthError('Logout failed');
+      }
     } catch {
       setAuthError('Network error during logout');
     }
