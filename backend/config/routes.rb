@@ -13,5 +13,11 @@ Rails.application.routes.draw do
     get '/current_user', to: 'users/sessions#current'
   end
 
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      get 'events/login_stats', to: 'events#login_stats'
+    end
+  end
+
   root to: "home#index"
 end
