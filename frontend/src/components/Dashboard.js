@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer
+} from 'recharts';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/v1/events/login_stats', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' },
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Erro HTTP ${res.status}: ${text}`);
+        }
+        return res.json();
+      })
+      .then((json) => {
+        const formatted = Object.entries(json).map(([date, count]) => ({
+          date,
+          count,
+        }));
+        setData(formatted);
+      })
+      .catch((err) => console.error('Erro ao carregar dados do gráfico:', err));
+  }, []);
 
   const wrapperStyle = {
     minHeight: '100vh',
@@ -16,7 +47,7 @@ const Dashboard = () => {
   };
 
   const cardStyle = {
-    width: 600,
+    width: 700,
     padding: 30,
     borderRadius: 8,
     backgroundColor: darkMode ? '#1a1a1a' : '#fff',
@@ -65,9 +96,29 @@ const Dashboard = () => {
           You are now logged in.
         </p>
 
-        <button style={buttonStyle} onClick={logout}>
-          Logout
-        </button>
+        <div style={{ width: '100%', height: 300, marginTop: 30 }}>
+          {data.length > 0 ? (
+            <ResponsiveContainer>
+              <BarChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#333' : '#ccc'} />
+                <XAxis dataKey="date" stroke={darkMode ? '#ccc' : '#555'} tick={{ fill: darkMode ? '#ccc' : '#555' }} />
+                <YAxis allowDecimals={false} stroke={darkMode ? '#ccc' : '#555'} tick={{ fill: darkMode ? '#ccc' : '#555' }} />
+                <Bar
+                  dataKey="count"
+                  fill={darkMode ? '#4dabf7' : '#007bff'}
+                  barSize={30}
+                  radius={[4, 4, 0, 0]}
+                  cursor="default"
+                  isAnimationActive={false}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p style={{ color: darkMode ? '#aaa' : '#666' }}>No login data available yet.</p>
+          )}
+        </div>
+
+        <button style={buttonStyle} onClick={logout}>Logout</button>
       </div>
     </div>
   );
