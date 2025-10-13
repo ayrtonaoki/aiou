@@ -7,6 +7,8 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer
 } from 'recharts';
 
@@ -16,9 +18,9 @@ const Dashboard = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/v1/events/login_stats', {
+    fetch('http://localhost:3000/api/v1/events/event_stats', {
       credentials: 'include',
-      headers: { 'Accept': 'application/json' },
+      headers: { Accept: 'application/json' },
     })
       .then(async (res) => {
         if (!res.ok) {
@@ -27,13 +29,7 @@ const Dashboard = () => {
         }
         return res.json();
       })
-      .then((json) => {
-        const formatted = Object.entries(json).map(([date, count]) => ({
-          date,
-          count,
-        }));
-        setData(formatted);
-      })
+      .then((json) => setData(json))
       .catch((err) => console.error('Erro ao carregar dados do gráfico:', err));
   }, []);
 
@@ -43,7 +39,7 @@ const Dashboard = () => {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: darkMode ? '#121212' : '#f5f5f5',
-    transition: 'background 0.3s ease'
+    transition: 'background 0.3s ease',
   };
 
   const cardStyle = {
@@ -54,7 +50,7 @@ const Dashboard = () => {
     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
     textAlign: 'center',
     position: 'relative',
-    transition: 'all 0.3s ease'
+    transition: 'all 0.3s ease',
   };
 
   const buttonStyle = {
@@ -65,7 +61,7 @@ const Dashboard = () => {
     color: '#fff',
     border: 'none',
     borderRadius: 5,
-    cursor: 'pointer'
+    cursor: 'pointer',
   };
 
   return (
@@ -85,7 +81,7 @@ const Dashboard = () => {
             border: 'none',
             borderRadius: '50%',
             fontSize: 18,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
           }}
         >
           {darkMode ? '☀️' : '🌙'}
@@ -96,29 +92,72 @@ const Dashboard = () => {
           You are now logged in.
         </p>
 
-        <div style={{ width: '100%', height: 300, marginTop: 30 }}>
+        <div style={{ width: '100%', height: 350, marginTop: 30 }}>
           {data.length > 0 ? (
             <ResponsiveContainer>
               <BarChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#333' : '#ccc'} />
-                <XAxis dataKey="date" stroke={darkMode ? '#ccc' : '#555'} tick={{ fill: darkMode ? '#ccc' : '#555' }} />
-                <YAxis allowDecimals={false} stroke={darkMode ? '#ccc' : '#555'} tick={{ fill: darkMode ? '#ccc' : '#555' }} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={darkMode ? '#333' : '#ccc'}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke={darkMode ? '#ccc' : '#555'}
+                  tick={{ fill: darkMode ? '#ccc' : '#555' }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  stroke={darkMode ? '#ccc' : '#555'}
+                  tick={{ fill: darkMode ? '#ccc' : '#555' }}
+                />
+                <Tooltip
+                  cursor={{ fill: darkMode ? '#222' : '#eee' }}
+                  contentStyle={{
+                    backgroundColor: darkMode ? '#1a1a1a' : '#fff',
+                    color: darkMode ? '#fff' : '#000',
+                    borderRadius: 8,
+                    border: `1px solid ${darkMode ? '#333' : '#ccc'}`,
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{
+                    color: darkMode ? '#ccc' : '#555',
+                    fontSize: 14,
+                  }}
+                />
                 <Bar
-                  dataKey="count"
-                  fill={darkMode ? '#4dabf7' : '#007bff'}
-                  barSize={30}
+                  dataKey="signup"
+                  fill="#28a745"
+                  barSize={20}
                   radius={[4, 4, 0, 0]}
-                  cursor="default"
-                  isAnimationActive={false}
+                  name="Signups"
+                />
+                <Bar
+                  dataKey="login"
+                  fill="#007bff"
+                  barSize={20}
+                  radius={[4, 4, 0, 0]}
+                  name="Logins"
+                />
+                <Bar
+                  dataKey="logout"
+                  fill="#dc3545"
+                  barSize={20}
+                  radius={[4, 4, 0, 0]}
+                  name="Logouts"
                 />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p style={{ color: darkMode ? '#aaa' : '#666' }}>No login data available yet.</p>
+            <p style={{ color: darkMode ? '#aaa' : '#666' }}>
+              No event data available yet.
+            </p>
           )}
         </div>
 
-        <button style={buttonStyle} onClick={logout}>Logout</button>
+        <button style={buttonStyle} onClick={logout}>
+          Logout
+        </button>
       </div>
     </div>
   );
