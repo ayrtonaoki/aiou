@@ -15,7 +15,7 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      get 'events/login_stats', to: 'events#login_stats'
+      get 'events/event_stats', to: 'events#event_stats'
     end
   end
 
