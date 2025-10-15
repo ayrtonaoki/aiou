@@ -30,7 +30,7 @@ const Dashboard = () => {
         return res.json();
       })
       .then((json) => setData(json))
-      .catch((err) => console.error('Erro ao carregar dados do gráfico:', err));
+      .catch((err) => console.error('Error:', err));
   }, []);
 
   const wrapperStyle = {
@@ -69,7 +69,6 @@ const Dashboard = () => {
       <div style={cardStyle}>
         <button
           onClick={toggleDarkMode}
-          aria-label="Alternar tema claro/escuro"
           style={{
             position: 'fixed',
             top: 20,
@@ -89,7 +88,7 @@ const Dashboard = () => {
 
         <h1 style={{ marginBottom: 8 }}>Welcome, {user?.email}!</h1>
         <p style={{ marginTop: 0, color: darkMode ? '#ccc' : '#555' }}>
-          You are now logged in.
+          Users access events dashboard:
         </p>
 
         <div style={{ width: '100%', height: 350, marginTop: 30 }}>
