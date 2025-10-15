@@ -1,15 +1,11 @@
 require 'faker'
 
-puts "🧹 Limpando banco de dados..."
 Event.delete_all
 User.delete_all
-
-puts "👤 Criando usuários..."
 
 users = []
 
 3.times do |i|
-  # Datas de criação aleatórias para cada usuário nos últimos 30 dias
   created_at = Faker::Date.backward(days: rand(5..30))
 
   users << User.create!(
@@ -20,10 +16,6 @@ users = []
     updated_at: created_at
   )
 end
-
-puts "✅ Criados #{users.count} usuários."
-
-puts "📅 Gerando eventos pareados por dia..."
 
 users.each do |user|
   signup_date = user.created_at.to_date
@@ -68,12 +60,3 @@ users.each do |user|
 end
 
 total_events = Event.count
-puts "\n✅ Criados #{total_events} eventos no total."
-puts "📊 Distribuição por tipo:"
-Event.group(:event_type).count.each do |type, count|
-  puts " - #{type}: #{count}"
-end
-
-puts "\n🕒 Intervalo de eventos:"
-puts " - Mais antigo: #{Event.minimum(:occurred_at)}"
-puts " - Mais recente: #{Event.maximum(:occurred_at)}"
