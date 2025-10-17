@@ -8,7 +8,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer
 } from 'recharts';
 
@@ -133,10 +132,7 @@ const Dashboard = () => {
           {data.length > 0 ? (
             <ResponsiveContainer>
               <BarChart data={data}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke={darkMode ? '#333' : '#ccc'}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#333' : '#ccc'} />
                 <XAxis
                   dataKey="date"
                   stroke={darkMode ? '#ccc' : '#555'}
@@ -154,12 +150,6 @@ const Dashboard = () => {
                     color: darkMode ? '#fff' : '#000',
                     borderRadius: 8,
                     border: `1px solid ${darkMode ? '#333' : '#ccc'}`,
-                  }}
-                />
-                <Legend
-                  wrapperStyle={{
-                    color: darkMode ? '#ccc' : '#555',
-                    fontSize: 14,
                   }}
                 />
                 {selectedEvents.signup && (
