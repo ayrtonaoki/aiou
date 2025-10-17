@@ -67,7 +67,7 @@ const Register = () => {
     padding: 10,
     borderRadius: 4,
     border: 'none',
-    backgroundColor: darkMode ? '#555' : '#007bff',
+    backgroundColor: '#555',
     color: '#fff',
     cursor: 'pointer',
     textAlign: 'center'
@@ -80,7 +80,6 @@ const Register = () => {
   return (
     <div style={wrapperStyle}>
       <div style={cardStyle}>
-        {/* Botão fixo no canto direito */}
         <button
           onClick={toggleDarkMode}
           aria-label="Alternar tema claro/escuro"
