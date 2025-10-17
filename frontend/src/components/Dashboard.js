@@ -64,71 +64,64 @@ const Dashboard = () => {
     transition: 'all 0.3s ease',
   };
 
-  const buttonStyle = {
-    display: 'block',
-    margin: '20px auto 0',
-    padding: '10px 20px',
-    backgroundColor: darkMode ? '#555' : '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 5,
+  const controlButtonStyle = {
+    padding: '8px 16px',
+    borderRadius: 6,
     cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: '0.2s',
   };
 
   return (
     <div style={wrapperStyle}>
       <div style={cardStyle}>
-        <button
-          onClick={toggleDarkMode}
+        <div
           style={{
             position: 'fixed',
             top: 20,
             right: 20,
-            padding: 10,
-            cursor: 'pointer',
-            backgroundColor: darkMode ? '#333' : '#ddd',
-            color: darkMode ? '#f9f9f9' : '#1a1a1a',
-            border: 'none',
-            borderRadius: '50%',
-            fontSize: 18,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            display: 'flex',
+            gap: 10,
           }}
         >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
+          <button
+            onClick={toggleDarkMode}
+            style={{
+              padding: 10,
+              cursor: 'pointer',
+              backgroundColor: darkMode ? '#333' : '#ddd',
+              color: darkMode ? '#f9f9f9' : '#1a1a1a',
+              border: 'none',
+              borderRadius: '50%',
+              fontSize: 18,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            }}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+          <button
+            onClick={logout}
+            style={{
+              display: 'block',
+              margin: 0,
+              padding: '10px 20px',
+              backgroundColor: '#333',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 5,
+              cursor: 'pointer',
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
 
         <h1 style={{ marginBottom: 8 }}>Welcome, {user?.email}!</h1>
         <p style={{ marginTop: 0, color: darkMode ? '#ccc' : '#555' }}>
           Users access events dashboard:
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
-          {['signup', 'login', 'logout'].map((type) => {
-            const active = selectedEvents[type];
-            const colors = { signup: '#22C55E', login: '#3B82F6', logout: '#EF4444' };
-
-            return (
-              <button
-                key={type}
-                onClick={() => handleFilterChange(type)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: 6,
-                  border: `2px solid ${colors[type]}`,
-                  backgroundColor: active ? colors[type] : 'transparent',
-                  color: active ? '#fff' : colors[type],
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  transition: '0.2s',
-                }}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
-            );
-          })}
-        </div>
-
-        <div style={{ width: '100%', height: 350, marginTop: 30 }}>
+        <div style={{ width: '100%', height: 350, marginTop: 20 }}>
           {data.length > 0 ? (
             <ResponsiveContainer>
               <BarChart data={data}>
@@ -188,9 +181,27 @@ const Dashboard = () => {
           )}
         </div>
 
-        <button style={buttonStyle} onClick={logout}>
-          Logout
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginTop: 20 }}>
+          {['signup', 'login', 'logout'].map((type) => {
+            const active = selectedEvents[type];
+            const colors = { signup: '#22C55E', login: '#3B82F6', logout: '#EF4444' };
+
+            return (
+              <button
+                key={type}
+                onClick={() => handleFilterChange(type)}
+                style={{
+                  ...controlButtonStyle,
+                  border: `2px solid ${colors[type]}`,
+                  backgroundColor: active ? colors[type] : 'transparent',
+                  color: active ? '#fff' : colors[type],
+                }}
+              >
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
