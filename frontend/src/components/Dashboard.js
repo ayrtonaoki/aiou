@@ -16,6 +16,18 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
   const [data, setData] = useState([]);
+  const [selectedEvents, setSelectedEvents] = useState({
+    login: true,
+    signup: true,
+    logout: true,
+  });
+
+  const handleFilterChange = (eventType) => {
+    setSelectedEvents((prev) => ({
+      ...prev,
+      [eventType]: !prev[eventType],
+    }));
+  };
 
   useEffect(() => {
     fetch('http://localhost:3000/api/v1/events/event_stats', {
@@ -91,6 +103,32 @@ const Dashboard = () => {
           Users access events dashboard:
         </p>
 
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
+          {['signup', 'login', 'logout'].map((type) => {
+            const active = selectedEvents[type];
+            const colors = { signup: '#22C55E', login: '#3B82F6', logout: '#EF4444' };
+
+            return (
+              <button
+                key={type}
+                onClick={() => handleFilterChange(type)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 6,
+                  border: `2px solid ${colors[type]}`,
+                  backgroundColor: active ? colors[type] : 'transparent',
+                  color: active ? '#fff' : colors[type],
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  transition: '0.2s',
+                }}
+              >
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </button>
+            );
+          })}
+        </div>
+
         <div style={{ width: '100%', height: 350, marginTop: 30 }}>
           {data.length > 0 ? (
             <ResponsiveContainer>
@@ -124,27 +162,33 @@ const Dashboard = () => {
                     fontSize: 14,
                   }}
                 />
-                <Bar
-                  dataKey="signup"
-                  fill="#28a745"
-                  barSize={20}
-                  radius={[4, 4, 0, 0]}
-                  name="Signups"
-                />
-                <Bar
-                  dataKey="login"
-                  fill="#007bff"
-                  barSize={20}
-                  radius={[4, 4, 0, 0]}
-                  name="Logins"
-                />
-                <Bar
-                  dataKey="logout"
-                  fill="#dc3545"
-                  barSize={20}
-                  radius={[4, 4, 0, 0]}
-                  name="Logouts"
-                />
+                {selectedEvents.signup && (
+                  <Bar
+                    dataKey="signup"
+                    fill="#2dca67ff"
+                    barSize={20}
+                    radius={[4, 4, 0, 0]}
+                    name="Signups"
+                  />
+                )}
+                {selectedEvents.login && (
+                  <Bar
+                    dataKey="login"
+                    fill="#3B82F6"
+                    barSize={20}
+                    radius={[4, 4, 0, 0]}
+                    name="Logins"
+                  />
+                )}
+                {selectedEvents.logout && (
+                  <Bar
+                    dataKey="logout"
+                    fill="#EF4444"
+                    barSize={20}
+                    radius={[4, 4, 0, 0]}
+                    name="Logouts"
+                  />
+                )}
               </BarChart>
             </ResponsiveContainer>
           ) : (
