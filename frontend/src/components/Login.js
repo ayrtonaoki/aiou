@@ -70,7 +70,7 @@ const Login = () => {
     padding: 10,
     borderRadius: 4,
     border: 'none',
-    backgroundColor: darkMode ? '#555' : '#007bff',
+    backgroundColor: '#555',
     color: '#fff',
     cursor: 'pointer',
     textAlign: 'center'
