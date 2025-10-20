@@ -1,8 +1,9 @@
 class Api::V1::EventsController < Api::V1::BaseController
   def event_stats
-    start_date = 30.days.ago.beginning_of_day
+    start_date = params[:start_date].present? ? Date.parse(params[:start_date]).beginning_of_day : 30.days.ago.beginning_of_day
+    end_date = params[:end_date].present? ? Date.parse(params[:end_date]).end_of_day : Time.current.end_of_day
 
-    data = Event.where('occurred_at >= ?', start_date)
+    data = Event.where(occurred_at: start_date..end_date)
                 .group(:event_type)
                 .group_by_day(:occurred_at)
                 .count
