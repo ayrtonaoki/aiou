@@ -21,6 +21,9 @@ const Dashboard = () => {
     logout: true,
   });
 
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   const handleFilterChange = (eventType) => {
     setSelectedEvents((prev) => ({
       ...prev,
@@ -28,8 +31,12 @@ const Dashboard = () => {
     }));
   };
 
-  useEffect(() => {
-    fetch('http://localhost:3000/api/v1/events/event_stats', {
+  const fetchData = () => {
+    const queryParams = new URLSearchParams();
+    if (startDate) queryParams.append('start_date', startDate);
+    if (endDate) queryParams.append('end_date', endDate);
+
+    fetch(`http://localhost:3000/api/v1/events/event_stats?${queryParams.toString()}`, {
       credentials: 'include',
       headers: { Accept: 'application/json' },
     })
@@ -42,6 +49,10 @@ const Dashboard = () => {
       })
       .then((json) => setData(json))
       .catch((err) => console.error('Error:', err));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const wrapperStyle = {
@@ -72,54 +83,131 @@ const Dashboard = () => {
     transition: '0.2s',
   };
 
+  const filterContainerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+    margin: '20px auto',
+    flexWrap: 'wrap',
+  };
+
+  const dateInputStyle = {
+    padding: '10px 14px',
+    borderRadius: 10,
+    border: darkMode ? '1px solid #333' : '1px solid #ccc',
+    backgroundColor: darkMode ? '#222' : '#fff',
+    color: darkMode ? '#f0f0f0' : '#111',
+    fontSize: 14,
+    outline: 'none',
+    transition: 'all 0.2s ease',
+    boxShadow: darkMode
+      ? 'inset 0 1px 3px rgba(255,255,255,0.05)'
+      : 'inset 0 1px 3px rgba(0,0,0,0.1)',
+  };
+
+  const buttonStyle = {
+    padding: '10px 18px',
+    border: 'none',
+    borderRadius: 8,
+    background: '#333',
+    color: '#fff',
+    fontWeight: 600,
+    cursor: 'pointer',
+    fontSize: 14,
+    transition: 'all 0.25s ease',
+  };
+
   return (
     <div style={wrapperStyle}>
-      <div style={cardStyle}>
-        <div
+      <div
+        style={{
+          position: 'fixed',
+          top: 20,
+          left: 20,
+          padding: '10px 15px',
+          backgroundColor: darkMode ? '#1a1a1a' : '#fff',
+          color: darkMode ? '#f0f0f0' : '#111',
+          borderRadius: 8,
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+          fontWeight: 600,
+          zIndex: 1000,
+        }}
+      >
+        {user ? `Logged in as: ${user.email}` : 'Not logged in'}
+      </div>
+
+      <div
+        style={{
+          position: 'fixed',
+          top: 20,
+          right: 20,
+          display: 'flex',
+          gap: 10,
+        }}
+      >
+        <button
+          onClick={toggleDarkMode}
           style={{
-            position: 'fixed',
-            top: 20,
-            right: 20,
-            display: 'flex',
-            gap: 10,
+            padding: 10,
+            cursor: 'pointer',
+            backgroundColor: darkMode ? '#333' : '#ddd',
+            color: darkMode ? '#f9f9f9' : '#1a1a1a',
+            border: 'none',
+            borderRadius: '50%',
+            fontSize: 18,
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
           }}
         >
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+        <button
+          onClick={logout}
+          style={{
+            display: 'block',
+            margin: 0,
+            padding: '10px 20px',
+            backgroundColor: '#333',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 5,
+            cursor: 'pointer',
+          }}
+        >
+          Sign Out
+        </button>
+      </div>
+      <div style={cardStyle}>
+        <h1 style={{ marginBottom: 8 }}>Events dashboard</h1>
+        <div style={filterContainerStyle}>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            style={dateInputStyle}
+            onFocus={(e) => (e.target.style.border = '1px solid #3B82F6')}
+            onBlur={(e) =>
+              (e.target.style.border = darkMode ? '1px solid #333' : '1px solid #ccc')
+            }
+          />
+          <span style={{ color: darkMode ? '#aaa' : '#666' }}>→</span>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            style={dateInputStyle}
+            onFocus={(e) => (e.target.style.border = '1px solid #3B82F6')}
+            onBlur={(e) =>
+              (e.target.style.border = darkMode ? '1px solid #333' : '1px solid #ccc')
+            }
+          />
           <button
-            onClick={toggleDarkMode}
-            style={{
-              padding: 10,
-              cursor: 'pointer',
-              backgroundColor: darkMode ? '#333' : '#ddd',
-              color: darkMode ? '#f9f9f9' : '#1a1a1a',
-              border: 'none',
-              borderRadius: '50%',
-              fontSize: 18,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-            }}
+            onClick={fetchData}
+            style={buttonStyle}
           >
-            {darkMode ? '☀️' : '🌙'}
-          </button>
-          <button
-            onClick={logout}
-            style={{
-              display: 'block',
-              margin: 0,
-              padding: '10px 20px',
-              backgroundColor: '#333',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 5,
-              cursor: 'pointer',
-            }}
-          >
-            Sign Out
+            Apply
           </button>
         </div>
-
-        <h1 style={{ marginBottom: 8 }}>Welcome, {user?.email}!</h1>
-        <p style={{ marginTop: 0, color: darkMode ? '#ccc' : '#555' }}>
-          Users access events dashboard:
-        </p>
 
         <div style={{ width: '100%', height: 350, marginTop: 20 }}>
           {data.length > 0 ? (
@@ -202,6 +290,33 @@ const Dashboard = () => {
             );
           })}
         </div>
+      </div>
+
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 20,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '8px 16px',
+          backgroundColor: darkMode ? '#1a1a1a' : '#fff',
+          color: darkMode ? '#f0f0f0' : '#111',
+          borderRadius: 8,
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+          fontWeight: 500,
+          fontSize: 14,
+          zIndex: 1000,
+        }}
+      >
+        Source code on {' '}
+        <a
+          href="https://github.com/ayrtonaoki/aiou"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: darkMode ? '#f0f0f0' : '#111', textDecoration: 'underline' }}
+        >
+          GitHub
+        </a>
       </div>
     </div>
   );
