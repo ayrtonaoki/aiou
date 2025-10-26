@@ -8,10 +8,11 @@ It allows users to **register, log in, and log out**, and records these events a
 - Fetch the currently logged-in user  
 - Event logging via background jobs (e.g., registration, login, logout)  
 - React frontend consuming Rails API  
-- Dockerized development environment  
+- Dockerized development environment
+- **Backend tests** written with **RSpec** for models, controllers, and jobs  
 
 ## Tech Stack
-- **Backend:** Ruby on Rails, PostgreSQL, Devise  
+- **Backend:** Ruby on Rails, PostgreSQL, Devise, RSpec
 - **Frontend:** React, Axios (or Fetch API)  
 - **Containerization:** Docker, Docker Compose  
 - **Background Jobs:** Active Job (default async or Sidekiq)  
@@ -37,6 +38,11 @@ docker compose up
 
 4. Access the frontend:
 Open http://localhost:3001 in your browser
+
+## Running tests
+```
+docker compose run backend bundle exec rspec
+```
 
 ## API Endpoints (Rails with Devise)
 - POST /signup – Register a new user
