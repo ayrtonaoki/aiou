@@ -1,6 +1,6 @@
 # Rails + React Authentication Project
 This is a **study project** built with **Ruby on Rails (backend)** and **React (frontend)**, communicating via a RESTful API. The project is containerized using **Docker**.  
-It allows users to **register, log in, and log out**, and records these events asynchronously using background jobs, storing them in the database. Authentication is handled using **Devise**, providing secure user management out-of-the-box.
+It allows users to **register, log in, and log out**, and records these events asynchronously using background jobs, storing them in the database. Authentication is handled using **Devise**, providing secure user management.
 
 ## Features
 - User registration with **email** and **password** via Devise  
