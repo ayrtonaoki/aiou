@@ -15,7 +15,7 @@ It allows users to **register, log in, and log out**, and records these events a
 - **Backend:** Ruby on Rails, PostgreSQL, Devise, RSpec
 - **Frontend:** React, Axios (or Fetch API)  
 - **Containerization:** Docker, Docker Compose  
-- **Background Jobs:** Active Job (default async or Sidekiq)  
+- **Background Jobs:** Sidekiq
 
 ## Setup
 ### Prerequisites
